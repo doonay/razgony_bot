@@ -26,6 +26,25 @@ bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotPropertie
 dp = Dispatcher()
 ### BODY ###
 
+@dp.message(Command("data"))
+async def get_data(message: Message):
+	conn = sqlite3.connect('youtube.db')
+	conn.row_factory = sqlite3.Row
+	with conn:
+		cur = conn.cursor()
+		cur.execute('''SELECT youtube_video_url FROM youtube_video_urls WHERE is_new is True OrderBy DESC''')
+		all_rows = cur.fetchall()
+		#all_video_urls = []
+		for row in all_rows:
+			await bot.send_message(5589295804, row['youtube_video_url']) 
+	'''
+	text = ''
+	for video_url in all_videos:
+		text = text + video_url + '\n'
+	
+	'''
+	#await message.send(5589295804, all_videos)
+
 #!DEBUG ВЫВОД ВСЕХ КОМАНД НА ТЕКУЩЕЙ СТАДИИ РАЗРАБОТКИ (не забывать ручками пополнять словарь)
 all_commands = {
 	'/whoami': 'Кто я?',
