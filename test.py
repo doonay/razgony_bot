@@ -21,10 +21,21 @@ dp = Dispatcher()
 ### BODY ###
 
 def youtube_parser():
+	'''
+	Парсит заданный плейлист ютуба по расписанию (планировщику задач)
+	'''
 	print('Tick! The time is: %s' % datetime.now())
 
 def tick():
+	'''
+	Задача для планировщика задач (расписание)
+	'''
 	youtube_parser()
+
+#!DEBUG
+@dp.message(Command("whoami"))
+async def whoami(message: Message):
+	await message.answer(f"<code>{message.chat.id}\n@{message.chat.username}\n{message.chat.first_name}</code>")
 
 ### END BODY ###
 @logger.catch
