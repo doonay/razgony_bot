@@ -5,6 +5,8 @@ from config_reader import config
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandObject
+#https://apscheduler.readthedocs.io/en/3.x/
+# !умеет добавлять задачи динамично, через БД
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from datetime import datetime
@@ -18,18 +20,20 @@ bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotPropertie
 dp = Dispatcher()
 ### BODY ###
 
-
-
-def tick(my_list):
+def youtube_parser():
 	print('Tick! The time is: %s' % datetime.now())
+
+def tick():
+	youtube_parser()
 
 ### END BODY ###
 @logger.catch
 async def runbot() -> None:
 	scheduler = AsyncIOScheduler() # (timezone=…..)
-	scheduler.add_job(tick, 'interval', seconds=5)
+	#scheduler.add_job(tick, 'interval', hour=12, replace_existing=True)
+	# !Отсчёт идет после запуска пулинга, т.е. первая задача выполнится после указанного интервала, а не сразу
+	scheduler.add_job(tick, 'interval', minutes=1, replace_existing=True)
 	scheduler.start() # строго перед стартом поллинга
-	#Если сделать привязку к бд, то задачи можно добавлять «на горячую».
 
 	# Отключить все апдейты, пока бот не запущен
 	await bot.delete_webhook(drop_pending_updates=True)
