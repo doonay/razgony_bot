@@ -4,6 +4,7 @@ import sqlite3 # на время тестов, в бою убрать!
 
 #DB
 from create_tables import run_create_tables_sql_script
+from insert_youtube_video_url_to_db import run_insert_youtube_video_url_script
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message, FSInputFile
@@ -25,16 +26,17 @@ bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotPropertie
 dp = Dispatcher()
 ### BODY ###
 
-
 def youtube_parser():
 	'''
-	Парсит заданный плейлист ютуба по расписанию (планировщику задач)
+	Парсит заданный плейлист ютуба
 	'''
-	print('Tick! The time is: %s' % datetime.now())
+	youtube_video_url = 'https://www.youtube.com/watch?v=k1aDVWL_ytY'
+	run_insert_youtube_video_url_script(youtube_video_url)
+	print('Вставили данные в таблицу. %s' % datetime.now())
 
 def tick():
 	'''
-	Задача для планировщика задач (расписание)
+	Запускает сканер-парсер по расписанию (планировщику задач)
 	'''
 	youtube_parser()
 
@@ -53,15 +55,26 @@ async def get_tables(message: Message):
 		cursor = conn.cursor()
 		cursor.execute('''SELECT name FROM sqlite_master WHERE type='table';''')
 		tables = cursor.fetchall()
-		#conn.commit()
 
-	await message.answer(f"<code>{db}\n@{tables}</code>")
+	await message.answer(f"<code>{db}\n{tables}</code>")
 
+#!DEBUG
+@dp.message(Command("videos"))
+async def get_all_youtube_video_urls(message: Message):
+	# тест вставки новых видео, в бою переделать под боевой метод получения!
+	db = 'youtube.db'
+	conn = sqlite3.connect(db)
+	with conn:
+		cursor = conn.cursor()
+		cursor.execute('''SELECT * FROM youtube_video_urls;''')
+		all_youtube_video_urls = cursor.fetchall()
+
+	await message.answer(f"<code>{all_youtube_video_urls}</code>")
 
 ### END BODY ###
 @logger.catch
 async def runbot() -> None:
-	#DB INIT
+	#DB INIT (создаем базу, если ее нет и все нужные таблицы, если их нет)
 	run_create_tables_sql_script()
 
 	scheduler = AsyncIOScheduler() # (timezone=…..)
