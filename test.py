@@ -11,7 +11,7 @@ from aiogram.types import Message, FSInputFile
 from config_reader import config
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import CommandStart, Command, CommandObject
 
 #https://apscheduler.readthedocs.io/en/3.x/
 # !умеет добавлять задачи динамично, через БД
@@ -25,6 +25,21 @@ logger.debug('Start')
 bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 ### BODY ###
+
+#!DEBUG ВЫВОД ВСЕХ КОМАНД НА ТЕКУЩЕЙ СТАДИИ РАЗРАБОТКИ (не забывать ручками пополнять словарь)
+all_commands = {
+	'/whoami': 'Кто я?',
+	'/tables': 'Тест создания таблиц',
+	'/videos': 'Тест вставки новых видео'
+}
+
+@dp.message(CommandStart())
+async def commands(message: Message):
+	text = ''
+	for command in all_commands:
+		text = text + (f'{command}\n')
+	await message.answer(f"<code>{text}</code>")
+
 
 def youtube_parser():
 	'''
@@ -70,6 +85,8 @@ async def get_all_youtube_video_urls(message: Message):
 		all_youtube_video_urls = cursor.fetchall()
 
 	await message.answer(f"<code>{all_youtube_video_urls}</code>")
+
+
 
 ### END BODY ###
 @logger.catch
