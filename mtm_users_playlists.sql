@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 --Многие--
 CREATE TABLE IF NOT EXISTS playlists (
-    youtube_playlist_id TEXT NOT NULL UNIQUE
+    youtube_playlist_id TEXT NOT NULL UNIQUE,
+    youtube_playlist_title TEXT NOT NULL UNIQUE
 );
 --Связующая--
 CREATE TABLE IF NOT EXISTS users_playlists (

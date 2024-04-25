@@ -72,7 +72,7 @@ def get_youtube_videos_from_playlist(youtube_playlist_url):
         #insert_many(youtube_video_urls)
         conn = sqlite3.connect('youtube.db')
         cur = conn.cursor()
-        cur.execute("INSERT OR IGNORE INTO videos(youtube_video_id) VALUES (?);", (video.video_id,))
+        cur.execute("INSERT OR IGNORE INTO videos(youtube_video_id, youtube_playlist_title) VALUES (?);", (video.video_id, video.title))
         #cur.execute("INSERT OR IGNORE INTO youtube_video_urls(youtube_video_url) VALUES (?);", (youtube_video))
         #last_row_id = cur.execute("SELECT youtube_video_url FROM youtube_video_urls WHERE youtube_video_url = ?;" (video.watch_url, ))
         conn.commit()

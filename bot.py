@@ -134,13 +134,15 @@ async def parse(message: Message):
 			for playlist in playlists:
 				# youtube_playlist_url = 'https://www.youtube.com/playlist?list=PLcQngyvNgfmK0mOFKfVdi2RNiaJTfuL5e'
 				youtube_playlist_id = playlist['youtube_playlist_id']
+				print(youtube_playlist_id)
 				youtube_playlist_url = f'https://www.youtube.com/playlist?list={youtube_playlist_id}'
+				print(youtube_playlist_url)
 
 				p = Playlist(youtube_playlist_url)
 				await message.answer(f"<code>Парсим {p.title}...</code>")
 
 				for video in p.videos:
-					cursor.execute("INSERT OR IGNORE INTO videos(youtube_video_id) VALUES (?);", (video.video_id,))
+					cursor.execute("INSERT OR IGNORE INTO videos(youtube_video_id, youtube_video_title) VALUES (?, ?);", (video.video_id, video.title))
 					conn.commit()
 				await message.answer("<code>Готово</code>")
 		else:
@@ -152,15 +154,20 @@ async def parse(message: Message):
 
 def youtube_list_url_validator(url: str):
 	# TODO: реализовать валидатор со всеми возможными вариантами ссылок, включая youtu.be
+	print(url)
 	return True
 
-def get_youtube_list_id(url: str):
-	youtube_list_id = url.split('=')[-1]
+def get_youtube_playlist_id(youtube_playlist_url: str):
+	youtube_list_id = youtube_playlist_url.split('=')[-1]
 	return youtube_list_id
 
-def get_youtube_playlist_title(url: str):
+def get_youtube_playlist_title(youtube_playlist_url: str):
 	# TODO: реализовать извлечение тайтла
-	return '"Тайтл переданного плейлиста"'
+	p = Playlist(youtube_playlist_url)
+	#title = p.title.replace('#', '').replace('[', '').replace(']', '')
+	title = p.title 
+	print(title)
+	return title
 
 # бот в пуллинге слушает все сообщения
 # если сообщение содержит 'youtu', бот пытается извлечь из сообщения ссылку
@@ -176,9 +183,12 @@ async def add_youtube_playlist_url(message: Message):
 		# если ссылка есть, она валидируется на плейлист
 		if youtube_list_url_validator(data['url']):
 			# если ссылка на плейлист валидна, бот добавляет в базу пользователя и ссылку на плейлист
-			youtube_list_id = get_youtube_list_id(data['url'])
+			youtube_playlist_id = get_youtube_playlist_id(data['url'])
+			print(youtube_playlist_id)
+			youtube_playlist_title = get_youtube_playlist_title(data['url'])
+			print(youtube_playlist_title)
 			#метод добавления tg_user_id и youtube_list_id в таблицу
-			run_insert_user_and_playlist_sql_script(message.from_user.id, youtube_list_id)
+			run_insert_user_and_playlist_sql_script(message.from_user.id, youtube_playlist_id, youtube_playlist_title)
 
 			youtube_playlist_title = get_youtube_playlist_title(data['url'])
 			text = f'Плейлист {youtube_playlist_title} добавлен.'

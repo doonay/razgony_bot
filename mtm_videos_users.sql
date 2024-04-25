@@ -1,6 +1,7 @@
 --Многие--
 CREATE TABLE IF NOT EXISTS videos (
     youtube_video_id TEXT NOT NULL UNIQUE,
+    youtube_video_title TEXT NOT NULL UNIQUE,
     is_new INTEGER DEFAULT 1 NOT NULL
 );
 --Многие--
