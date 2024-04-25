@@ -79,6 +79,7 @@ async def get_playlists(message: Message):
 	# запрос всех плейлистов
 	db = 'youtube.db'
 	conn = sqlite3.connect(db)
+	conn.row_factory = sqlite3.Row
 	temp_playlists = []
 	with conn:
 		cursor = conn.cursor()
@@ -88,18 +89,20 @@ async def get_playlists(message: Message):
 	if len(temp_playlists) > 0:
 		playlists = ''
 		for p in temp_playlists:
-			playlists += (p[0]+'\n')
+			playlists += (p['youtube_playlist_title']+'\n')
 		await message.answer(f"<code>{playlists}</code>")
 	else:
 		await message.answer("<code>None</code>")
 
 
 #!DEBUG
+@logger.catch
 # запрос всех видеороликов из базы
 @dp.message(Command("videos"))
 async def get_all_youtube_video_urls(message: Message):
 	db = 'youtube.db'
 	conn = sqlite3.connect(db)
+	conn.row_factory = sqlite3.Row
 	temp_videos = []
 	with conn:
 		cursor = conn.cursor()
@@ -108,11 +111,12 @@ async def get_all_youtube_video_urls(message: Message):
 
 	if len(temp_videos) > 0:
 		videos = ''
-		for p in temp_videos:
-			videos += (p[0]+'\n')
-		await message.answer(videos)
+		for v in temp_videos:
+			videos += (v['youtube_video_id'] + '\n')
+		await message.answer(f"<code>{videos}</code>")
 	else:
 		await message.answer("<code>None</code>")
+
 
 #!DEBUG
 # немедленный парсинг добавленных ссылок на плейлисты
