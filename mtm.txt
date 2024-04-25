@@ -1,0 +1,57 @@
+-- составной ключ CONSTRAINT PRIMARY KEY (id_user, id_playlist)
+-- дополнительный составной ключ CONSTRAINT UNIQUE (id_user, id_playlist)
+-- PRIMARY KEY - это в одном флаконе сразу UNIQUE, NOT NULL и AUTOINCREMENT
+
+--Многие--
+CREATE TABLE IF NOT EXISTS users (
+    tg_user_id integer NOT NULL UNIQUE
+);
+--Многие--
+CREATE TABLE IF NOT EXISTS playlists (
+    playlist_url text NOT NULL UNIQUE
+);
+--Связующая--
+CREATE TABLE IF NOT EXISTS users_playlists (
+    user integer NOT NULL,
+    playlist text NOT NULL,
+    CONSTRAINT user_playlist PRIMARY KEY (user, playlist)
+    FOREIGN KEY (user) REFERENCES users(tg_user_id)
+    FOREIGN KEY (playlist) REFERENCES playlists(playlist_url)
+);
+
+INSERT OR IGNORE INTO users (tg_user_id) VALUES (1234567890);
+INSERT OR IGNORE INTO playlists (playlist_url) VALUES ('https://trulala0');
+INSERT OR IGNORE INTO users_playlists (user, playlist) VALUES (1234567890, 'https://trulala0');
+
+INSERT OR IGNORE INTO users (tg_user_id) VALUES (111);
+INSERT OR IGNORE INTO playlists (playlist_url) VALUES ('https://trulala1');
+INSERT OR IGNORE INTO users_playlists (user, playlist) VALUES (111, 'https://trulala1');
+
+INSERT OR IGNORE INTO users (tg_user_id) VALUES (1234567890);
+INSERT OR IGNORE INTO playlists (playlist_url) VALUES ('https://trulala1');
+INSERT OR IGNORE INTO users_playlists (user, playlist) VALUES (1234567890, 'https://trulala1');
+
+--повторим для проверки уникальности
+INSERT OR IGNORE INTO users (user) VALUES (1234567890);
+INSERT OR IGNORE INTO playlists (playlist) VALUES ('https://trulala0');
+INSERT OR IGNORE INTO users_playlists (user, playlist) VALUES (1234567890, 'https://trulala0');
+
+INSERT OR IGNORE INTO users (user) VALUES (111);
+INSERT OR IGNORE INTO playlists (playlist) VALUES ('https://trulala1');
+INSERT OR IGNORE INTO users_playlists (user, playlist) VALUES (111, 'https://trulala1');
+
+INSERT OR IGNORE INTO users (user) VALUES (1234567890);
+INSERT OR IGNORE INTO playlists (playlist) VALUES ('https://trulala1');
+INSERT OR IGNORE INTO users_playlists (user, playlist) VALUES (1234567890, 'https://trulala1');
+--====RESULT====
+
+SELECT * from users;
+--1234567890
+--111
+SELECT * from playlists;
+--https://trulala0
+--https://trulala1
+SELECT * from users_playlists;
+--1234567890|https://trulala0
+--111|https://trulala1
+--1234567890|https://trulala1
