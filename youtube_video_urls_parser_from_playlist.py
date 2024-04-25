@@ -51,7 +51,7 @@ def get_youtube_videos_from_playlist(youtube_playlist_url):
     '''
 
     p = Playlist(youtube_playlist_url) # тут искаропки допускается ссылка с параметром видоса внутри!
-
+    
     #print(p.videos[55].author)
     #print(p.videos[55].channel_id)
     #print(p.videos[55].channel_url)
@@ -61,20 +61,18 @@ def get_youtube_videos_from_playlist(youtube_playlist_url):
     #print(p.videos[55].streaming_data) потоки с сылками для скачивания
     #print(p.videos[55].streams)
     #print(p.videos[55].thumbnail_url) иконка
-    print(p.videos[55].title)
+    print(p.title)
     #print(p.videos[55].video_id) айдишник видеоролика
-    print(p.videos[55].watch_url)
+    #print(p.videos[55].watch_url)
 
-    videos = p.videos.reverse()
-    for video in videos:
-        temp_list = []
-        temp_list.append(video.watch_url)
+    for video in p.videos:
+        #temp_list = []
+        #temp_list.append(video.watch_url)
         #youtube_video_urls.append(temp_list)
         #insert_many(youtube_video_urls)
         conn = sqlite3.connect('youtube.db')
         cur = conn.cursor()
-        print(type(video.watch_url), video.watch_url)
-        cur.execute("INSERT OR IGNORE INTO youtube_video_urls(youtube_video_url) VALUES (?);", (video.watch_url,))
+        cur.execute("INSERT OR IGNORE INTO videos(youtube_video_id) VALUES (?);", (video.video_id,))
         #cur.execute("INSERT OR IGNORE INTO youtube_video_urls(youtube_video_url) VALUES (?);", (youtube_video))
         #last_row_id = cur.execute("SELECT youtube_video_url FROM youtube_video_urls WHERE youtube_video_url = ?;" (video.watch_url, ))
         conn.commit()
@@ -93,7 +91,7 @@ if __name__ == '__main__':
     insert_many(youtube_video_urls)
     '''
     # test insert one
-    '''
+    ''' 
     youtube_video_url = 'https://www.youtube.com/watch?v=g1eKfEIQ2oc'
     insert_one(youtube_video_url)
     '''
